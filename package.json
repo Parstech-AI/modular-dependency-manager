@@ -5,6 +5,10 @@
   "author": "Amirreza Khordestan",
   "private": false,
   "license": "MIT",
+  "main": "dist/main.js",
+  "files": [
+    "dist"
+  ],
   "keywords": [
     "package manager",
     "dependency",
