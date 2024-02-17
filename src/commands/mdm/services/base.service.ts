@@ -11,6 +11,17 @@ export class BaseService extends ConfigService {
     super();
   }
 
+  readFile(path: string) {
+    try {
+      const file = fs.readFileSync(path, {
+        encoding: 'utf-8',
+      });
+      return JSON.parse(file);
+    } catch (e) {
+      return {};
+    }
+  }
+
   splitVersion(dependency: string): [dependency: string, version?: string] {
     const [dep, ver] = dependency.split('@');
     return [dep, ver];
@@ -43,7 +54,7 @@ export class BaseService extends ConfigService {
     dependencies: [string, string][];
     devDependencies: [string, string][];
   } {
-    const data = JSON.parse(fs.readFileSync(file, { encoding: 'utf8' }));
+    const data = this.readFile(file);
     return {
       dependencies: data.dependencies ? Object.entries(data.dependencies) : [],
       devDependencies: data.devDependencies
@@ -62,11 +73,8 @@ export class BaseService extends ConfigService {
   }
 
   getInstalledDepVersion(dependency: string, dev = false) {
-    const packageJson = fs.readFileSync('./package.json', {
-      encoding: 'utf8',
-    });
-    const dependencies =
-      JSON.parse(packageJson)[dev ? 'devDependencies' : 'dependencies'];
+    const packageJson = this.readFile(this.packageJsonFilePath);
+    const dependencies = packageJson[dev ? 'devDependencies' : 'dependencies'];
     if (dependency in dependencies) return dependencies[dependency];
     else throw 'dependency is not listed in package.json';
   }

@@ -2,6 +2,8 @@ import * as fs from 'fs';
 
 export class ConfigService {
   readonly configFilePath = './.mdmrc';
+  readonly packageJsonFilePath = './package.json';
+  readonly mainDependencyFilePath = './dependencies.json';
   private pathToModules = './src/@modules';
   private dependencyFileName = 'dependencies.json';
   private dependencyLockFileName = 'dependency-lock.json';

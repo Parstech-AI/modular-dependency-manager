@@ -21,6 +21,10 @@ npm i --save modular-dependency-manager
 
 You can use the CLI to manage your module dependencies.
 
+- Initialize(creates main dependency file from package.json):
+  ```bash
+  mdm init
+  ```
 - Installing all Dependencies:
   ```bash
   mdm i [-m <module-name>]
