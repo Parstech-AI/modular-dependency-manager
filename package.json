@@ -6,6 +6,10 @@
   "private": false,
   "license": "MIT",
   "main": "dist/main.js",
+  "bin": {
+    "mdm": "./dist/main.js"
+  },
+  "preferGlobal": true,
   "files": [
     "dist"
   ],
