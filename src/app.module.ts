@@ -5,6 +5,7 @@ import { RemoveService } from './commands/mdm/sub-commands/remove/remove.service
 import { AskService } from './commands/mdm/services/ask.service';
 import { BaseService } from './commands/mdm/services/base.service';
 import { InitService } from './commands/mdm/sub-commands/init/init.service';
+import { RunService } from './commands/mdm/services/run.service';
 
 @Module({
   providers: [
@@ -13,6 +14,7 @@ import { InitService } from './commands/mdm/sub-commands/init/init.service';
     RemoveService,
     InstallService,
     InitService,
+    RunService,
     AskService,
     Logger,
   ],

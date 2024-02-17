@@ -32,7 +32,7 @@ export class RemoveCommand extends CommandRunner {
             options.keep,
           );
         } else {
-          await this.removeService.removeAll(options.keep);
+          await this.removeService.removeAll(options.keep, options.global);
         }
       }
     } catch (e) {
@@ -55,6 +55,15 @@ export class RemoveCommand extends CommandRunner {
     description: "don't remove dependencies from modules dependency files",
   })
   parseKeep() {
+    return true;
+  }
+
+  @Option({
+    name: 'global',
+    flags: '-g, --global',
+    description: 'remove global dependencies also',
+  })
+  parseGlobal() {
     return true;
   }
 }

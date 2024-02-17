@@ -14,9 +14,13 @@ export class RemoveService {
   }
 
   async removeFromModule(params: string[], module?: string, keep = false) {
-    const file = await this.baseService.findModulePath(module);
+    const file = module
+      ? await this.baseService.findModulePath(module)
+      : undefined;
 
+    this.progress.start(params.length);
     await this.removeDeps(params, file, keep);
+    this.progress.stop();
 
     this.logService.log(`Removed ${params.length} dependencies successfully`);
   }
@@ -33,10 +37,11 @@ export class RemoveService {
     }
   }
 
-  async removeAll(keep = false) {
+  async removeAll(keep = false, removeGlobals = false) {
     const lockedData = this.baseService.readLockFile();
     let depsTotalCount = 0;
     for (const modulePath in lockedData) {
+      if (!removeGlobals && modulePath === 'global') continue;
       this.logService.log(`Removing ${modulePath} dependencies...`);
       depsTotalCount += await this.removeAllDeps(modulePath, keep);
     }
@@ -52,7 +57,9 @@ export class RemoveService {
   ) {
     for (const dependency of params) {
       const { data } = await this.baseService.removeDep(dependency, modulePath);
-      if (!keep) this.baseService.writeDepsToFile(data, modulePath);
+      if (!keep && modulePath) {
+        this.baseService.writeDepsToFile(data, modulePath);
+      }
       this.progress.increment();
     }
   }

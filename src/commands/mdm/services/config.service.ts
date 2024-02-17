@@ -28,10 +28,16 @@ export class ConfigService {
   }
 
   writeLockFile(json: object) {
-    fs.writeFileSync(
-      `./${this.dependencyLockFileName}`,
-      JSON.stringify(json, null, 2),
-    );
+    return new Promise((resolve, reject) => {
+      fs.writeFile(
+        `./${this.dependencyLockFileName}`,
+        JSON.stringify(json, null, 2),
+        (err) => {
+          if (err) reject(err);
+          else resolve(true);
+        },
+      );
+    });
   }
 
   private setConfigsFromRCFile() {

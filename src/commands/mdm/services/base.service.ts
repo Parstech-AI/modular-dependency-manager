@@ -1,13 +1,16 @@
 import { glob } from 'glob';
 import * as fs from 'fs';
-import { exec } from 'child_process';
 import { ConfigService } from './config.service';
 import { AskService } from './ask.service';
 import { Injectable } from '@nestjs/common';
+import { RunService } from './run.service';
 
 @Injectable()
 export class BaseService extends ConfigService {
-  constructor(private readonly askService: AskService) {
+  constructor(
+    private readonly runService: RunService,
+    private readonly askService: AskService,
+  ) {
     super();
   }
 
@@ -79,88 +82,71 @@ export class BaseService extends ConfigService {
     else throw 'dependency is not listed in package.json';
   }
 
-  installDep(
+  async installDep(
     dependency: string,
     version?: string,
     dev = false,
     modulePath?: string,
   ): Promise<object | string> {
-    return new Promise((resolve, reject) => {
-      exec(
+    try {
+      await this.runService.run(
         `npm i --save ${dev ? '-D' : ''} ${dependency}${version ? `@${version}` : ''}`,
-        async (err, stdout, stderr) => {
-          if (err) {
-            reject(err);
-            return;
-          }
-
-          if (stderr) reject(stderr);
-          else {
-            const installedVersion = await this.getInstalledDepVersion(
-              dependency,
-              dev,
-            );
-            resolve(
-              this.addToLockFile(dependency, installedVersion, dev, modulePath),
-            );
-          }
-        },
       );
-    });
+      const installedVersion = await this.getInstalledDepVersion(
+        dependency,
+        dev,
+      );
+      return this.addToLockFile(dependency, installedVersion, dev, modulePath);
+    } catch (e) {
+      return e;
+    }
   }
 
-  removeDep(
+  async removeDep(
     dependency: string,
     modulePath?: string,
   ): Promise<{
     module: 'global' | string;
     data: object;
   }> {
-    return new Promise((resolve, reject) => {
-      exec(`npm r ${dependency}`, (err, stdout, stderr) => {
-        if (err) {
-          reject(err);
-          return;
-        }
-
-        if (stderr) reject(stderr);
-        else resolve(this.removeFromLockFile(dependency, modulePath));
-      });
-    });
+    try {
+      await this.runService.run(`npm r ${dependency}`);
+      return this.removeFromLockFile(dependency, modulePath);
+    } catch (e) {
+      return e;
+    }
   }
 
-  private addToLockFile(
+  private async addToLockFile(
     dependency: string,
     version?: string,
     dev = false,
     module = 'global',
-  ): object {
+  ): Promise<object> {
     const lockedData = this.readLockFile();
     const data = { [dependency]: version };
     const moduleData = lockedData[module] ?? {};
     if (dev) {
-      Object.assign(moduleData, {
-        devDependencies: data,
-      });
+      moduleData.devDependencies ||= {};
+      Object.assign(moduleData.devDependencies, data);
     } else {
-      Object.assign(moduleData, {
-        dependencies: data,
-      });
+      moduleData.dependencies ||= {};
+      Object.assign(moduleData.dependencies, data);
     }
     Object.assign(lockedData, {
       [module]: moduleData,
     });
-    this.writeLockFile(lockedData);
+    await this.writeLockFile(lockedData);
     return moduleData;
   }
 
-  private removeFromLockFile(
+  private async removeFromLockFile(
     dependency: string,
     module?: string,
-  ): {
+  ): Promise<{
     module: 'global' | string;
     data: object;
-  } {
+  }> {
     const lockedData = this.readLockFile();
     let foundModule: string | null = null;
 
@@ -194,8 +180,10 @@ export class BaseService extends ConfigService {
       }
     }
 
-    if (!Object.keys(lockedData[module]).length) delete lockedData[module];
-    if (foundModule) this.writeLockFile(lockedData);
+    if (!Object.keys(lockedData[foundModule]).length) {
+      delete lockedData[foundModule];
+    }
+    if (foundModule) await this.writeLockFile(lockedData);
     return { module: foundModule, data: lockedData[foundModule] ?? {} };
   }
 }

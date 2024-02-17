@@ -31,8 +31,14 @@ You can use the CLI to manage your module dependencies.
   ```
 - Removing all Dependencies:
   ```bash
-  mdm r [-m <module-name>] [-k]
+  mdm r [-m <module-name>] [-k] [-g]
   ```
+  
+  > **⚠️ Warning**
+  > 
+  > `mdm r` doesn't remove global dependencies by default!
+  > Use **-g flag** to do so
+
 - Adding a Dependency:
   ```bash
   mdm i <package-name>@<version> [-m <module-name>] [-d]
@@ -40,6 +46,10 @@ You can use the CLI to manage your module dependencies.
 - Removing a Dependency:
   ```bash
   mdm r <package-name> [-m <module-name>] [-k]
+  ```
+- Run package manager commands:
+  ```bash
+  mdm run <package-manager-commands>
   ```
   
 ## configuration
