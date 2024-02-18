@@ -1,9 +1,9 @@
 import { glob } from 'glob';
 import * as fs from 'fs';
-import { ConfigService } from './config.service';
-import { AskService } from './ask.service';
 import { Injectable } from '@nestjs/common';
+import { ConfigService } from './config.service';
 import { RunService } from './run.service';
+import { AskService } from './ask.service';
 
 @Injectable()
 export class BaseService extends ConfigService {
@@ -180,7 +180,10 @@ export class BaseService extends ConfigService {
       }
     }
 
-    if (!Object.keys(lockedData[foundModule]).length) {
+    if (
+      lockedData[foundModule] &&
+      !Object.keys(lockedData[foundModule]).length
+    ) {
       delete lockedData[foundModule];
     }
     if (foundModule) await this.writeLockFile(lockedData);

@@ -1,6 +1,7 @@
-import { BaseService } from '../../services/base.service';
-import { Injectable, Logger } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { ProgressService } from '../../services/progress.service';
+import { BaseService } from '../../services/base.service';
+import { LoggerService } from '../../../../services/Logger.service';
 
 @Injectable()
 export class RemoveService {
@@ -8,7 +9,7 @@ export class RemoveService {
 
   constructor(
     private readonly baseService: BaseService,
-    private readonly logService: Logger,
+    private readonly logService: LoggerService,
   ) {
     this.progress = new ProgressService('Removing dependencies');
   }

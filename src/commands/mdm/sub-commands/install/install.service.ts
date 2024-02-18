@@ -1,6 +1,7 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { BaseService } from '../../services/base.service';
 import { ProgressService } from '../../services/progress.service';
+import { LoggerService } from '../../../../services/Logger.service';
 
 @Injectable()
 export class InstallService {
@@ -8,7 +9,7 @@ export class InstallService {
 
   constructor(
     private readonly baseService: BaseService,
-    private readonly logService: Logger,
+    private readonly logService: LoggerService,
   ) {
     this.progress = new ProgressService('Installing dependencies');
   }

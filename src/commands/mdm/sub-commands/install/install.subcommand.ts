@@ -1,6 +1,6 @@
 import { CommandRunner, Option, SubCommand } from 'nest-commander';
+import { LoggerService } from '../../../../services/Logger.service';
 import { InstallService } from './install.service';
-import { Logger } from '@nestjs/common';
 import { InstallCommandOptions } from './install.types';
 
 @SubCommand({
@@ -12,7 +12,7 @@ import { InstallCommandOptions } from './install.types';
 export class InstallCommand extends CommandRunner {
   constructor(
     private readonly installService: InstallService,
-    private readonly logService: Logger,
+    private readonly logService: LoggerService,
   ) {
     super();
   }

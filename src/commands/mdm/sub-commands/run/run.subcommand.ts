@@ -1,5 +1,5 @@
 import { CommandRunner, SubCommand } from 'nest-commander';
-import { Logger } from '@nestjs/common';
+import { LoggerService } from '../../../../services/Logger.service';
 import { RunService } from '../../services/run.service';
 
 @SubCommand({
@@ -10,7 +10,7 @@ import { RunService } from '../../services/run.service';
 export class RunCommand extends CommandRunner {
   constructor(
     private readonly runService: RunService,
-    private readonly logService: Logger,
+    private readonly logService: LoggerService,
   ) {
     super();
   }

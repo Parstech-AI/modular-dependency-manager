@@ -1,11 +1,12 @@
-import { Logger, Module } from '@nestjs/common';
-import { MdmCommand } from './commands/mdm/mdm.command';
+import { Module } from '@nestjs/common';
 import { InstallService } from './commands/mdm/sub-commands/install/install.service';
-import { RemoveService } from './commands/mdm/sub-commands/remove/remove.service';
-import { AskService } from './commands/mdm/services/ask.service';
+import { MdmCommand } from './commands/mdm/mdm.command';
 import { BaseService } from './commands/mdm/services/base.service';
+import { RemoveService } from './commands/mdm/sub-commands/remove/remove.service';
 import { InitService } from './commands/mdm/sub-commands/init/init.service';
 import { RunService } from './commands/mdm/services/run.service';
+import { AskService } from './commands/mdm/services/ask.service';
+import { LoggerService } from './services/Logger.service';
 
 @Module({
   providers: [
@@ -16,7 +17,7 @@ import { RunService } from './commands/mdm/services/run.service';
     InitService,
     RunService,
     AskService,
-    Logger,
+    LoggerService,
   ],
 })
 export class AppModule {}

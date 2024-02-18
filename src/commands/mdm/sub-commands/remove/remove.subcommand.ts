@@ -1,7 +1,7 @@
 import { CommandRunner, Option, SubCommand } from 'nest-commander';
-import { Logger } from '@nestjs/common';
-import { RemoveCommandOptions } from './remove.types';
+import { LoggerService } from '../../../../services/Logger.service';
 import { RemoveService } from './remove.service';
+import { RemoveCommandOptions } from './remove.types';
 
 @SubCommand({
   name: 'remove',
@@ -12,7 +12,7 @@ import { RemoveService } from './remove.service';
 export class RemoveCommand extends CommandRunner {
   constructor(
     private readonly removeService: RemoveService,
-    private readonly logService: Logger,
+    private readonly logService: LoggerService,
   ) {
     super();
   }

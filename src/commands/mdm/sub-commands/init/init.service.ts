@@ -1,11 +1,12 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { BaseService } from '../../services/base.service';
+import { LoggerService } from '../../../../services/Logger.service';
 
 @Injectable()
 export class InitService {
   constructor(
     private readonly baseService: BaseService,
-    private readonly logService: Logger,
+    private readonly logService: LoggerService,
   ) {}
 
   initializeMainDependencyFile() {
