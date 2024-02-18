@@ -1,8 +1,8 @@
-import { CommandRunner, SubCommand } from 'nest-commander';
+import { Command, CommandRunner } from 'nest-commander';
 import { LoggerService } from '../../../../services/Logger.service';
 import { RunService } from '../../services/run.service';
 
-@SubCommand({
+@Command({
   name: 'run',
   description: 'run your package manager commands',
   arguments: '<package-manager-command>',

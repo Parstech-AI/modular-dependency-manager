@@ -1,9 +1,9 @@
-import { CommandRunner, Option, SubCommand } from 'nest-commander';
+import { Command, CommandRunner, Option } from 'nest-commander';
 import { LoggerService } from '../../../../services/Logger.service';
 import { RemoveService } from './remove.service';
 import { RemoveCommandOptions } from './remove.types';
 
-@SubCommand({
+@Command({
   name: 'remove',
   description: 'removes modules dependencies',
   aliases: ['r'],

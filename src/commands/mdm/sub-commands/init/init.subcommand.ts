@@ -1,8 +1,8 @@
-import { CommandRunner, SubCommand } from 'nest-commander';
+import { Command, CommandRunner } from 'nest-commander';
 import { LoggerService } from '../../../../services/Logger.service';
 import { InitService } from './init.service';
 
-@SubCommand({
+@Command({
   name: 'init',
   description: 'writes main dependency file from package.json',
 })

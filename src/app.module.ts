@@ -7,10 +7,18 @@ import { InitService } from './commands/mdm/sub-commands/init/init.service';
 import { RunService } from './commands/mdm/services/run.service';
 import { AskService } from './commands/mdm/services/ask.service';
 import { LoggerService } from './services/Logger.service';
+import { InstallCommand } from './commands/mdm/sub-commands/install/install.subcommand';
+import { RemoveCommand } from './commands/mdm/sub-commands/remove/remove.subcommand';
+import { InitCommand } from './commands/mdm/sub-commands/init/init.subcommand';
+import { RunCommand } from './commands/mdm/sub-commands/run/run.subcommand';
 
 @Module({
   providers: [
-    ...MdmCommand.registerWithSubCommands(),
+    MdmCommand,
+    InstallCommand,
+    RemoveCommand,
+    InitCommand,
+    RunCommand,
     BaseService,
     RemoveService,
     InstallService,

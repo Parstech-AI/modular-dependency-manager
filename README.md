@@ -14,7 +14,7 @@ scalable way.
 ## Installation
 
 ```bash
-npm i --save modular-dependency-manager
+npm i -g modular-dependency-manager
 ```
 
 ## Usage

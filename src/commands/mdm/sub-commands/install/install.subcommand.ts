@@ -1,9 +1,9 @@
-import { CommandRunner, Option, SubCommand } from 'nest-commander';
+import { Command, CommandRunner, Option } from 'nest-commander';
 import { LoggerService } from '../../../../services/Logger.service';
 import { InstallService } from './install.service';
 import { InstallCommandOptions } from './install.types';
 
-@SubCommand({
+@Command({
   name: 'install',
   description: 'installs modules dependencies',
   aliases: ['i'],
