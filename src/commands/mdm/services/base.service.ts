@@ -89,7 +89,7 @@ export class BaseService extends ConfigService {
     modulePath?: string,
   ): Promise<object | string> {
     try {
-      await this.runService.run(
+      await this.runService.exec(
         `npm i --save ${dev ? '-D' : ''} ${dependency}${version ? `@${version}` : ''}`,
       );
       const installedVersion = await this.getInstalledDepVersion(
@@ -110,7 +110,7 @@ export class BaseService extends ConfigService {
     data: object;
   }> {
     try {
-      await this.runService.run(`npm r ${dependency}`);
+      await this.runService.exec(`npm r ${dependency}`);
       return this.removeFromLockFile(dependency, modulePath);
     } catch (e) {
       return e;
