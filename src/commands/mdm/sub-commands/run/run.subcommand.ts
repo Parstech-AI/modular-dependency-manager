@@ -17,7 +17,10 @@ export class RunCommand extends CommandRunner {
 
   async run(passedParams: string[]) {
     try {
-      await this.runService.run(`npm run ${passedParams.join(' ')}`);
+      const result = await this.runService.run(
+        `npm run ${passedParams.join(' ')}`,
+      );
+      this.logService.log(result);
     } catch (e) {
       this.logService.error(e);
     }
