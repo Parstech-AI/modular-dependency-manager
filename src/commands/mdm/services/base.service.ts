@@ -90,7 +90,9 @@ export class BaseService extends ConfigService {
   ): Promise<object | string> {
     try {
       await this.runService.exec(
-        `npm i --save ${dev ? '-D' : ''} ${dependency}${version ? `@${version}` : ''}`,
+        `npm i --save ${dev ? '-D' : ''} ${dependency}${
+          version ? `@${version}` : ''
+        }`,
       );
       const installedVersion = await this.getInstalledDepVersion(
         dependency,

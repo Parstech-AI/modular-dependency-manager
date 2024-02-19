@@ -81,6 +81,8 @@ export class InstallService {
       this.progress.stop();
     }
 
+    await this.writeMainDepsToLockFile();
+
     const lockedData = this.baseService.readLockFile();
     if (lockedData.global) {
       this.logService.log(`Installing global dependencies...`);
@@ -102,6 +104,22 @@ export class InstallService {
     }
 
     this.logService.log(`added ${totalDepsCount} from all modules`);
+  }
+
+  private async writeMainDepsToLockFile() {
+    const { dependencies, devDependencies } = this.baseService.readFile(
+      this.baseService.mainDependencyFilePath,
+    );
+    const lockedData = this.baseService.readLockFile();
+    const moduleData = lockedData.global ?? {};
+    moduleData.devDependencies ||= {};
+    Object.assign(moduleData.devDependencies, devDependencies);
+    moduleData.dependencies ||= {};
+    Object.assign(moduleData.dependencies, dependencies);
+    Object.assign(lockedData, {
+      global: moduleData,
+    });
+    await this.baseService.writeLockFile(lockedData);
   }
 
   private async installDeps(
