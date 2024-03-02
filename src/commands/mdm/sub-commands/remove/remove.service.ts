@@ -42,7 +42,12 @@ export class RemoveService {
     const lockedData = this.baseService.readLockFile();
     let depsTotalCount = 0;
     for (const modulePath in lockedData) {
-      if (!removeGlobals && modulePath === 'global') continue;
+      if (
+        !removeGlobals &&
+        modulePath === this.baseService.mainDependencyFilePath
+      ) {
+        continue;
+      }
       this.logService.log(`Removing ${modulePath} dependencies...`);
       depsTotalCount += await this.removeAllDeps(modulePath, keep);
     }
@@ -59,7 +64,7 @@ export class RemoveService {
     for (const dependency of params) {
       const { data } = await this.baseService.removeDep(dependency, modulePath);
       if (!keep && modulePath) {
-        this.baseService.writeDepsToFile(data, modulePath);
+        await this.baseService.writeDepsToFile(data, modulePath);
       }
       this.progress.increment();
     }

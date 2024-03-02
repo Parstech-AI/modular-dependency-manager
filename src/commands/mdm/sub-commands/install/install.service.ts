@@ -20,7 +20,7 @@ export class InstallService {
     for (const dependency of params) {
       const [dep, ver] = this.baseService.splitVersion(dependency);
       const moduleData = await this.baseService.installDep(dep, ver, dev, file);
-      this.baseService.writeDepsToFile(moduleData as object, file);
+      await this.baseService.writeDepsToFile(moduleData as object, file);
       this.progress.increment();
     }
     this.progress.stop();
@@ -34,7 +34,11 @@ export class InstallService {
     this.progress.start(params.length);
     for (const dependency of params) {
       const [dep, ver] = this.baseService.splitVersion(dependency);
-      await this.baseService.installDep(dep, ver, dev);
+      const moduleData = await this.baseService.installDep(dep, ver, dev);
+      await this.baseService.writeDepsToFile(
+        moduleData as object,
+        this.baseService.mainDependencyFilePath,
+      );
       this.progress.increment();
     }
     this.progress.stop();
@@ -44,18 +48,10 @@ export class InstallService {
   async installFromModule(module: string) {
     const file = await this.baseService.findModulePath(module);
 
-    const deps = this.baseService.extractDeps(file);
-
-    const totalDepsCount =
-      deps.dependencies.length + deps.devDependencies.length;
-
-    this.progress.start(totalDepsCount);
-    await this.installDeps(deps.dependencies, false, file);
-    await this.installDeps(deps.devDependencies, true, file);
-    this.progress.stop();
+    const depsCount = await this.readAndInstall(file);
 
     this.logService.log(
-      `added ${totalDepsCount} dependencies from ${module} module successfully`,
+      `added ${depsCount} dependencies from ${module} module successfully`,
     );
   }
 
@@ -66,60 +62,40 @@ export class InstallService {
     for (const file of files) {
       this.logService.log(`Installing ${file} dependencies...`);
 
-      const deps = this.baseService.extractDeps(file);
-      const depsCount = deps.dependencies.length + deps.devDependencies.length;
+      const depsCount = await this.readAndInstall(file);
       totalDepsCount += depsCount;
 
       if (!depsCount) {
         this.logService.log(`this module has no dependencies!`);
-        continue;
       }
-
-      this.progress.start(depsCount);
-      await this.installDeps(deps.dependencies, false, file);
-      await this.installDeps(deps.devDependencies, true, file);
-      this.progress.stop();
     }
 
-    await this.writeMainDepsToLockFile();
+    this.logService.log(`Installing global dependencies...`);
 
-    const lockedData = this.baseService.readLockFile();
-    if (lockedData.global) {
-      this.logService.log(`Installing global dependencies...`);
+    const depsCount = await this.readAndInstall(
+      this.baseService.mainDependencyFilePath,
+    );
+    totalDepsCount += depsCount;
 
-      const depsCount = this.baseService.getDepsCount(lockedData.global);
-      totalDepsCount += depsCount;
-
-      this.progress.start(depsCount);
-      if ('dependencies' in lockedData.global) {
-        await this.installDeps(Object.entries(lockedData.global.dependencies));
-      }
-      if ('devDependencies' in lockedData.global) {
-        await this.installDeps(
-          Object.entries(lockedData.global.devDependencies),
-          true,
-        );
-      }
-      this.progress.stop();
+    if (!depsCount) {
+      this.logService.log(`no global dependencies found!`);
     }
 
     this.logService.log(`added ${totalDepsCount} from all modules`);
   }
 
-  private async writeMainDepsToLockFile() {
-    const { dependencies, devDependencies } = this.baseService.readFile(
-      this.baseService.mainDependencyFilePath,
-    );
-    const lockedData = this.baseService.readLockFile();
-    const moduleData = lockedData.global ?? {};
-    moduleData.devDependencies ||= {};
-    Object.assign(moduleData.devDependencies, devDependencies);
-    moduleData.dependencies ||= {};
-    Object.assign(moduleData.dependencies, dependencies);
-    Object.assign(lockedData, {
-      global: moduleData,
-    });
-    await this.baseService.writeLockFile(lockedData);
+  private async readAndInstall(file: string) {
+    const deps = this.baseService.extractDeps(file);
+    const depsCount = deps.dependencies.length + deps.devDependencies.length;
+
+    if (!depsCount) return 0;
+
+    this.progress.start(depsCount);
+    await this.installDeps(deps.dependencies, false, file);
+    await this.installDeps(deps.devDependencies, true, file);
+    this.progress.stop();
+
+    return depsCount;
   }
 
   private async installDeps(

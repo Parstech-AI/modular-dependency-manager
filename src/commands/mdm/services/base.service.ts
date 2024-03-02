@@ -50,7 +50,12 @@ export class BaseService extends ConfigService {
   }
 
   writeDepsToFile(deps: object, file: string) {
-    fs.writeFileSync(file, JSON.stringify(deps, null, 2));
+    return new Promise((resolve, reject) => {
+      fs.writeFile(file, JSON.stringify(deps, null, 2), (err) => {
+        if (err) reject(err);
+        else resolve(true);
+      });
+    });
   }
 
   extractDeps(file: string): {
@@ -64,15 +69,6 @@ export class BaseService extends ConfigService {
         ? Object.entries(data.devDependencies)
         : [],
     };
-  }
-
-  getDepsCount(json: object) {
-    const depsCount =
-      'dependencies' in json ? Object.keys(json.dependencies).length : 0;
-    const devDepsCount =
-      'devDependencies' in json ? Object.keys(json.devDependencies).length : 0;
-
-    return depsCount + devDepsCount;
   }
 
   getInstalledDepVersion(dependency: string, dev = false) {
@@ -108,7 +104,7 @@ export class BaseService extends ConfigService {
     dependency: string,
     modulePath?: string,
   ): Promise<{
-    module: 'global' | string;
+    module: string;
     data: object;
   }> {
     try {
@@ -123,11 +119,12 @@ export class BaseService extends ConfigService {
     dependency: string,
     version?: string,
     dev = false,
-    module = 'global',
+    module?: string,
   ): Promise<object> {
     const lockedData = this.readLockFile();
     const data = { [dependency]: version };
-    const moduleData = lockedData[module] ?? {};
+    const modulePath = module ?? this.mainDependencyFilePath;
+    const moduleData = lockedData[modulePath] ?? {};
     if (dev) {
       moduleData.devDependencies ||= {};
       Object.assign(moduleData.devDependencies, data);
@@ -136,7 +133,7 @@ export class BaseService extends ConfigService {
       Object.assign(moduleData.dependencies, data);
     }
     Object.assign(lockedData, {
-      [module]: moduleData,
+      [modulePath]: moduleData,
     });
     await this.writeLockFile(lockedData);
     return moduleData;
@@ -146,7 +143,7 @@ export class BaseService extends ConfigService {
     dependency: string,
     module?: string,
   ): Promise<{
-    module: 'global' | string;
+    module: string;
     data: object;
   }> {
     const lockedData = this.readLockFile();
