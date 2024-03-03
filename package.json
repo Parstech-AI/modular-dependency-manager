@@ -1,6 +1,6 @@
 {
   "name": "modular-dependency-manager",
-  "version": "0.0.9",
+  "version": "0.0.10",
   "description": "modular dependency manager",
   "author": "Amirreza Khordestan",
   "private": false,
